@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
+#include "DefaultCharacter.h"
+
 #include "InteractionComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -29,8 +32,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Interaction")
 	TEnumAsByte<EInteractionType> InteractionType;
 
+	// interact with the object. returns whether the interaction was successful
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void Interact(ADefaultCharacter* Character);
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteract, ADefaultCharacter*, Character);
+	
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+	FInteract OnInteract;
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+private:
 };

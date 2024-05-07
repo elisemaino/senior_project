@@ -40,7 +40,7 @@ void ADefaultCharacter::Tick(float DeltaTime)
 
 void ADefaultCharacter::TickHolding(float DeltaTime) {
 	if (!HeldActor) return;
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "holding!");
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "holding!");
 	AStaticMeshActor* MeshActor = Cast<AStaticMeshActor>(HeldActor);
 	if (!MeshActor) return;
 	//UPrimitiveComponent* PrimitiveComponent = MeshActor->GetStaticMeshComponent();
@@ -54,6 +54,7 @@ void ADefaultCharacter::TickHolding(float DeltaTime) {
 	
 	FVector Vel = HoldLocation - HeldActor->GetActorLocation();
 	Vel = (Vel * HoldVelocityScale).GetClampedToMaxSize(HoldMaxVelocity);
+
 	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Vel);
 	//MeshActor->GetStaticMeshComponent()->AddImpulse(Dir * HoldMaxVelocity);
 }
@@ -127,12 +128,15 @@ void ADefaultCharacter::InputInteract() {
 
 	UInteractionComponent* InteractionComponent = HitActor->FindComponentByClass<UInteractionComponent>();
 	if (InteractionComponent) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "interactive");
+		InteractionComponent->Interact(this);
+		//InteractionComponent->InteractEvent
+		//bool Success = InteractionComponent->Interact(this);
+		/*GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "interactive");
 		switch (InteractionComponent->InteractionType) {
 			case InteractionHold:
 				Hold(HitActor);
 				break;
-		}
+		}*/
 	}
 	/*
 	//IInteractive* InteractiveActor = Cast<IInteractive>(HitActor);

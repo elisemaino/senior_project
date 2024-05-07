@@ -55,6 +55,8 @@ public:
 
 	virtual void TickHolding(float DeltaTime);
 
+	// Hold an actor
+	UFUNCTION(BlueprintCallable)
 	virtual void Hold(AActor* Actor);
 
 	// Called to bind functionality to input
