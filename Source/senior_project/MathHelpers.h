@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cmath>
+
 #include "CoreMinimal.h"
-
-
 
 /**
  * 

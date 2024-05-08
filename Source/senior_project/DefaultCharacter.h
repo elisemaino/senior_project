@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -11,14 +13,34 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/StaticMeshActor.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Math/UnrealMathUtility.h"
+#include "Camera/CameraComponent.h"
+#include "CollisionShape.h"
 
 #include "InteractionComponent.h"
 
 #include "DefaultCharacter.generated.h"
+
+// default movement values
+#define MOVEMENT_MASS 1000
+#define MOVEMENT_AIR_CONTROL 0.55
+#define MOVEMENT_MAX_ACCELERATION 3300
+#define MOVEMENT_BRAKING_DECELERATION_FALLING 1500
+
+// min and max pitch of the camera
+#define CAMERA_PITCH_MAX 89.0
+#define CAMERA_PITCH_MIN -89.0
+
+// initial transform of camera
+#define CAMERA_TRANSFORM FTransform(FVector(0, 0, 88))
+
+// params for when a held object "sticks" to a surface (to avoid weird physics glitches)
+#define HOLD_STICK_TIME 0.05
+#define HOLD_STICK_FACTOR 0.15
 
 UENUM(BlueprintType)
 enum EAction {
@@ -36,6 +58,9 @@ public:
 	ADefaultCharacter();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UCameraComponent* Camera;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -44,11 +69,14 @@ public:
 	TEnumAsByte<EAction> CurrentAction = ActionDefault;
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	AActor* HeldActor;
-	float InteractMaxDistance = 1000; // maximum distance which a character can interact with an object
-	float HoldOffset = 100; // offset added to bounding sphere radius when determining distance of held object from player
-	float HoldVelocityScale = 15;
-	float HoldMaxVelocity = 3000;
-	float HoldMaxPitch = 30;
+	float InteractMaxDistance = 300; // maximum distance which a character can interact with an object
+	float HoldMaxDistance = 275; // maximum distance from an object before forcibly letting go of it
+	float HoldOffset = 75; // offset added to bounding sphere radius when determining distance of held object from player
+	float HoldVelocityScale = 25;
+	float HoldMaxVelocity = 1000; // maximum velocity of a held object. also the throw velocity
+	float HoldMaxPitch = 70;
+	float HoldMinPitch = -45;
+	float HoldLastHit = -999;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -59,6 +87,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Hold(AActor* Actor);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void EndHold();
+
+	UFUNCTION()
+	void HeldActorHit(AActor* ActorA, AActor* ActorB, FVector Location, const FHitResult& HitResult);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Throw();
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -68,4 +105,5 @@ public:
 	virtual void InputCameraY(float Value);
 	virtual void InputJump();
 	virtual void InputInteract();
+	virtual void InputAltInteract();
 };

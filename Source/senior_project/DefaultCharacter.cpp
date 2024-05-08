@@ -14,9 +14,16 @@ ADefaultCharacter::ADefaultCharacter()
 	//CurrentAction = ActionDefault;
 
 	UCharacterMovementComponent* Movement = Cast<UCharacterMovementComponent>(GetMovementComponent());
-	Movement->AirControl = 0.55;
-	Movement->MaxAcceleration = 3300;
-	Movement->BrakingDecelerationFalling = 1500;
+	//Movement->Mass = MOVEMENT_MASS;
+	Movement->AirControl = MOVEMENT_AIR_CONTROL;
+	Movement->MaxAcceleration = MOVEMENT_MAX_ACCELERATION;
+	Movement->BrakingDecelerationFalling = MOVEMENT_BRAKING_DECELERATION_FALLING;
+
+	//FAttachmentTransformRules CameraAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	//FTransform CameraTransform;
+	Camera->SetRelativeTransform(CAMERA_TRANSFORM, false);
+	Camera->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 }
 
 // Called when the game starts or when spawned
@@ -29,6 +36,11 @@ void ADefaultCharacter::BeginPlay()
 void ADefaultCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	// camera
+	Camera->SetWorldRotation(GetControlRotation(), false);
+
+	// actions
 	switch (CurrentAction) {
 		case ActionHolding:
 			TickHolding(DeltaTime);
@@ -45,26 +57,97 @@ void ADefaultCharacter::TickHolding(float DeltaTime) {
 	if (!MeshActor) return;
 	//UPrimitiveComponent* PrimitiveComponent = MeshActor->GetStaticMeshComponent();
 	FRotator Rot = Controller->GetControlRotation();
-	Rot.Pitch = FMath::Clamp(Rot.Pitch, -HoldMaxPitch, HoldMaxPitch);
+	Rot.Pitch = FMath::Clamp(Rot.Pitch, HoldMinPitch, HoldMaxPitch);
 	const FVector Dir = FRotationMatrix(Rot).GetScaledAxis(EAxis::X);
 	FVector BBOrigin;
 	FVector BBExtent;
 	HeldActor->GetActorBounds(true, BBOrigin, BBExtent);
-	FVector HoldLocation = GetActorLocation() + Dir * (BBExtent.Size() + HoldOffset);
+	FVector HoldLocation = Camera->GetComponentLocation() + Dir * (BBExtent.Size() + HoldOffset);
+
+	/*
+	FHitResult OutHit;
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+	CollisionQueryParams.AddIgnoredActor(HeldActor);
+	bool hit = GetWorld()->SweepSingleByChannel(OutHit, BBOrigin, HoldLocation, HeldActor->GetActorQuat(), ECollisionChannel::ECC_PhysicsBody, FCollisionShape::MakeBox(BBExtent), CollisionQueryParams);
+	*/
+
+	//FHitResult HitResult;
+	//MeshActor->GetStaticMeshComponent()->SetWorldLocation(HoldLocation, true, &HitResult);
+	//HeldActor->SetActorLocation(HoldLocation, true, &HitResult);
 	
-	FVector Vel = HoldLocation - HeldActor->GetActorLocation();
-	Vel = (Vel * HoldVelocityScale).GetClampedToMaxSize(HoldMaxVelocity);
+	FVector Vel = HoldLocation - BBOrigin; // HeldActor->GetActorLocation();
+	if (Vel.Size() > HoldMaxDistance) {
+		EndHold();
+		return;
+	}
+	Vel = (Vel * HoldVelocityScale).GetClampedToMaxSize(GetGameTimeSinceCreation() - HoldLastHit > HOLD_STICK_TIME ? HoldMaxVelocity : HoldMaxVelocity * HOLD_STICK_FACTOR);
+
+	/*if (hit) {
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("%f"), (OutHit.Location - BBOrigin).Size()));
+		Vel = Vel * std::max((OutHit.Location - BBOrigin).Size(), 0.01f);
+	}*/
 
 	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Vel);
 	//MeshActor->GetStaticMeshComponent()->AddImpulse(Dir * HoldMaxVelocity);
 }
 
 void ADefaultCharacter::Hold(AActor* Actor) {
-	if(CurrentAction != ActionDefault) return;
+	if (CurrentAction != ActionDefault) return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "hold!");
+	//FCollisionQueryParams CollisionQueryParams;
+	//GetWorld()->DebugDrawTraceTag = "Debug";
+	//CollisionQueryParams.TraceTag = "Debug";
+	TArray<FOverlapResult> OutOverlaps;
+	bool Hit = GetWorld()->OverlapMultiByChannel(OutOverlaps, GetActorLocation(), GetActorQuat(), ECollisionChannel::ECC_PhysicsBody, FCollisionShape::MakeCapsule(GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.1, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + InteractMaxDistance));
+	if (Hit) {
+		for (int i = 0; i < OutOverlaps.Num(); i++) {
+			AActor* OtherActor = OutOverlaps[i].Actor.Get();
+			if (!OtherActor) { continue; }
+			if (OtherActor == Actor) {
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "initial overlap!");
+				return;
+			}
+		}
+	}
+
+	if (HeldActor) {
+		EndHold();
+	}
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "hold!");
 	CurrentAction = ActionHolding;
 	HeldActor = Actor;
+
+	HeldActor->OnActorHit.AddDynamic(this, &ADefaultCharacter::HeldActorHit); // bind actor hit delegate
+}
+
+void ADefaultCharacter::EndHold() {
+	if (!HeldActor) { return; }
+	HeldActor->OnActorHit.RemoveAll(this); // unbind actor hit delegate
+	HeldActor = nullptr;
+	CurrentAction = ActionDefault;
+}
+
+void ADefaultCharacter::Throw() {
+	if (!HeldActor) { return; }
+	AStaticMeshActor* MeshActor = Cast<AStaticMeshActor>(HeldActor);
+	if (!MeshActor) return;
+	FRotator Rot = Controller->GetControlRotation();
+	Rot.Pitch = FMath::Clamp(Rot.Pitch, HoldMinPitch, HoldMaxPitch);
+	const FVector Dir = FRotationMatrix(Rot).GetScaledAxis(EAxis::X);
+	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Dir * HoldMaxVelocity);
+	EndHold();
+}
+
+
+void ADefaultCharacter::HeldActorHit(AActor* ActorA, AActor* ActorB, FVector Location, const FHitResult& HitResult) {
+	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "held actor hit!");
+	HoldLastHit = GetGameTimeSinceCreation();
+	if (ActorB == this) {
+		EndHold();
+	}
+
 }
 
 // Called to bind functionality to input
@@ -79,6 +162,7 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	InputComponent->BindAxis("CameraY", this, &ADefaultCharacter::InputCameraY);
 	InputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Jump);
 	InputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputInteract);
+	InputComponent->BindAction("AltInteract", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputAltInteract);
 }
 
 void ADefaultCharacter::InputMovementX(float Value) {
@@ -103,7 +187,8 @@ void ADefaultCharacter::InputCameraX(float Value) {
 
 void ADefaultCharacter::InputCameraY(float Value) {
 	FRotator Rot = Controller->GetControlRotation();
-	Rot += FRotator(Value, 0, 0);
+	//Rot += FRotator(Value, 0, 0);
+	Rot += FRotator(Rot.Pitch + Value > CAMERA_PITCH_MAX || Rot.Pitch + Value < CAMERA_PITCH_MIN ? 0 : Value, 0, 0);
 	Controller->SetControlRotation(Rot);
 }
 
@@ -112,51 +197,38 @@ void ADefaultCharacter::InputJump() {
 }
 
 void ADefaultCharacter::InputInteract() {
-	if (CurrentAction != ActionDefault) return;
+	switch (CurrentAction) {
+	case ActionDefault: {
+		FVector Start = Camera->GetComponentLocation();
+		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+		FVector End = Start + Direction * InteractMaxDistance;
+		struct FHitResult OutHit;
 
-	FVector Start = GetActorLocation();
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
-	FVector End = Start + Direction * InteractMaxDistance;
-	struct FHitResult OutHit;
+		//FCollisionQueryParams Params;
+		//Params.TraceTag = "Debug";
+		//GetWorld()->DebugDrawTraceTag = "Debug";
+		//bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility, Params);
+		bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
+		if (!Hit) { return; }
 
-	FCollisionQueryParams Params;
-	Params.TraceTag = "Debug";
-	GetWorld()->DebugDrawTraceTag = "Debug";
+		AActor* HitActor = OutHit.Actor.Get();
+		if (!HitActor) { return; }
 
-	bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility, Params);
-	AActor* HitActor = OutHit.Actor.Get();
-
-	UInteractionComponent* InteractionComponent = HitActor->FindComponentByClass<UInteractionComponent>();
-	if (InteractionComponent) {
-		InteractionComponent->Interact(this);
-		//InteractionComponent->InteractEvent
-		//bool Success = InteractionComponent->Interact(this);
-		/*GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "interactive");
-		switch (InteractionComponent->InteractionType) {
-			case InteractionHold:
-				Hold(HitActor);
-				break;
-		}*/
-	}
-	/*
-	//IInteractive* InteractiveActor = Cast<IInteractive>(HitActor);
-	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TCHAR("ptr: %u"), InteractiveActor));
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, HitActor->GetClass()->GetFName().ToString());
-	bool InteractiveActor = HitActor->GetClass()->ImplementsInterface(UInterface::StaticClass());
-	//bool InteractiveActor = HitActor->Implements<UInterface>();
-	//bool InteractiveActor = UKismetSystemLibrary::DoesImplementInterface(HitActor, UInterface::StaticClass());
-	if (InteractiveActor) {
-		//IInteractive* InteractiveActor = Cast<IInteractive>(HitActor);
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "valid interactive actor!");
-		//InteractionType T = InteractiveActor->Execute_Interact(this);
-		InteractionType T = IInteractive::Execute_Interact(HitActor, this);
-		switch (T) {
-			case InteractionType::InteractionHold:
-				Hold(HitActor);
-				break;
-			default:
-				break;
+		UInteractionComponent* InteractionComponent = HitActor->FindComponentByClass<UInteractionComponent>();
+		if (InteractionComponent) {
+			InteractionComponent->Interact(this);
 		}
+	} break;
+	case ActionHolding: {
+		EndHold();
+	} break;
 	}
-	*/
+}
+
+void ADefaultCharacter::InputAltInteract() {
+	switch (CurrentAction) {
+	case ActionHolding: {
+		Throw();
+	} break;
+	}
 }
