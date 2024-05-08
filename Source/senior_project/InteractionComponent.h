@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-
-#include "DefaultCharacter.h"
+#include "GameFramework/Character.h"
 
 #include "InteractionComponent.generated.h"
 
@@ -34,9 +33,9 @@ public:
 
 	// interact with the object. returns whether the interaction was successful
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
-	void Interact(ADefaultCharacter* Character);
+	void Interact(ACharacter* Character);
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteract, ADefaultCharacter*, Character);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteract, ACharacter*, Character);
 	
 	UPROPERTY(BlueprintAssignable, Category = "Event")
 	FInteract OnInteract;

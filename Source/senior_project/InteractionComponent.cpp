@@ -32,6 +32,6 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 	// ...
 }
 
-void UInteractionComponent::Interact(ADefaultCharacter* Character) {
+void UInteractionComponent::Interact(ACharacter* Character) {
 	OnInteract.Broadcast(Character);
 }
