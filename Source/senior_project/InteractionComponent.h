@@ -8,11 +8,11 @@
 
 #include "InteractionComponent.generated.h"
 
-UENUM(BlueprintType)
-enum EInteractionType {
-	InteractionCustom,
-	InteractionHold
-};
+//UENUM(BlueprintType)
+//enum EInteractionType {
+//	InteractionCustom,
+//	InteractionHold
+//};
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SENIOR_PROJECT_API UInteractionComponent : public UActorComponent
@@ -28,8 +28,11 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Interaction")
-	TEnumAsByte<EInteractionType> InteractionType;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Interaction")
+	//TEnumAsByte<EInteractionType> InteractionType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interaction")
+	FText Hint;
 
 	// interact with the object. returns whether the interaction was successful
 	UFUNCTION(BlueprintCallable, Category = "Interaction")

@@ -40,13 +40,40 @@ void ADefaultCharacter::Tick(float DeltaTime)
 	// camera
 	Camera->SetWorldRotation(GetControlRotation(), false);
 
+	// interact
+	InteractTraceHitComponent = nullptr;
+
 	// actions
 	switch (CurrentAction) {
-		case ActionHolding:
-			TickHolding(DeltaTime);
-			break;
-		default:
-			break;
+	case ActionHolding: {
+		TickHolding(DeltaTime);
+	} break;
+	default: {
+		TickDefault(DeltaTime);
+	} break;
+	}
+}
+
+void ADefaultCharacter::TickDefault(float DeltaTime) {
+	FVector Start = Camera->GetComponentLocation();
+	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+	FVector End = Start + Direction * InteractMaxDistance;
+	FHitResult OutHit;
+
+	//FCollisionQueryParams Params;
+	//Params.TraceTag = "Debug";
+	//GetWorld()->DebugDrawTraceTag = "Debug";
+	//bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility, Params);
+	bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
+	if (Hit) {
+		AActor* HitActor = OutHit.Actor.Get();
+		if (HitActor) {
+			InteractTraceHitComponent = HitActor->FindComponentByClass<UInteractionComponent>();
+		} else {
+			InteractTraceHitComponent = nullptr; // redundant for now
+		}
+	} else {
+		InteractTraceHitComponent = nullptr; // redundant for now
 	}
 }
 
@@ -199,24 +226,8 @@ void ADefaultCharacter::InputJump() {
 void ADefaultCharacter::InputInteract() {
 	switch (CurrentAction) {
 	case ActionDefault: {
-		FVector Start = Camera->GetComponentLocation();
-		FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
-		FVector End = Start + Direction * InteractMaxDistance;
-		struct FHitResult OutHit;
-
-		//FCollisionQueryParams Params;
-		//Params.TraceTag = "Debug";
-		//GetWorld()->DebugDrawTraceTag = "Debug";
-		//bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility, Params);
-		bool Hit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECollisionChannel::ECC_Visibility);
-		if (!Hit) { return; }
-
-		AActor* HitActor = OutHit.Actor.Get();
-		if (!HitActor) { return; }
-
-		UInteractionComponent* InteractionComponent = HitActor->FindComponentByClass<UInteractionComponent>();
-		if (InteractionComponent) {
-			InteractionComponent->Interact(this);
+		if (InteractTraceHitComponent) {
+			InteractTraceHitComponent->Interact(this);
 		}
 	} break;
 	case ActionHolding: {

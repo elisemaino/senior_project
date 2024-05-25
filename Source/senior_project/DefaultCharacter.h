@@ -67,8 +67,16 @@ protected:
 public:	
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	TEnumAsByte<EAction> CurrentAction = ActionDefault;
+
+	UPROPERTY(Blueprintable, BlueprintReadOnly)
+	FText Hint = FText::FromString("");
+
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	AActor* HeldActor;
+
+	UPROPERTY(Blueprintable, BlueprintReadOnly)
+	UInteractionComponent* InteractTraceHitComponent; // updated every frame. nullptr if no component was found.
+
 	float InteractMaxDistance = 300; // maximum distance which a character can interact with an object
 	float HoldMaxDistance = 275; // maximum distance from an object before forcibly letting go of it
 	float HoldOffset = 75; // offset added to bounding sphere radius when determining distance of held object from player
@@ -80,6 +88,8 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void TickDefault(float DeltaTime);
 
 	virtual void TickHolding(float DeltaTime);
 
