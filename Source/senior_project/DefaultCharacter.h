@@ -22,6 +22,7 @@
 #include "CollisionShape.h"
 
 #include "InteractionComponent.h"
+#include "InventoryItem.h"
 
 #include "DefaultCharacter.generated.h"
 
@@ -43,9 +44,9 @@
 #define HOLD_STICK_FACTOR 0.15
 
 UENUM(BlueprintType)
-enum EAction {
-	ActionDefault,
-	ActionHolding
+enum class EAction : uint8 {
+	Default,
+	Holding
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -61,19 +62,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UCameraComponent* Camera;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	UPROPERTY(Blueprintable, BlueprintReadOnly)
-	TEnumAsByte<EAction> CurrentAction = ActionDefault;
-
-	UPROPERTY(Blueprintable, BlueprintReadOnly)
-	FText Hint = FText::FromString("");
-
-	UPROPERTY(Blueprintable, BlueprintReadOnly)
-	AActor* HeldActor;
-
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	UInteractionComponent* InteractTraceHitComponent; // updated every frame. nullptr if no component was found.
 
@@ -85,6 +73,22 @@ public:
 	float HoldMaxPitch = 70;
 	float HoldMinPitch = -45;
 	float HoldLastHit = -999;
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	UPROPERTY(Blueprintable, BlueprintReadOnly)
+	EAction CurrentAction = EAction::Default;
+
+	//UPROPERTY(Blueprintable, BlueprintReadOnly)
+	//FText Hint = FText::FromString("");
+
+	UPROPERTY(Blueprintable, BlueprintReadOnly)
+	AActor* HeldActor;
+
+	UPROPERTY(Blueprintable, BlueprintReadOnly)
+	TArray<EItem> Items;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -11,7 +11,7 @@ ADefaultCharacter::ADefaultCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//CurrentAction = ActionDefault;
+	//CurrentAction = EAction::Default;
 
 	UCharacterMovementComponent* Movement = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	//Movement->Mass = MOVEMENT_MASS;
@@ -41,11 +41,11 @@ void ADefaultCharacter::Tick(float DeltaTime)
 	Camera->SetWorldRotation(GetControlRotation(), false);
 
 	// interact
-	InteractTraceHitComponent = nullptr;
+	InteractTraceHitComponent = nullptr; 
 
 	// actions
 	switch (CurrentAction) {
-	case ActionHolding: {
+	case EAction::Holding: {
 		TickHolding(DeltaTime);
 	} break;
 	default: {
@@ -120,7 +120,7 @@ void ADefaultCharacter::TickHolding(float DeltaTime) {
 }
 
 void ADefaultCharacter::Hold(AActor* Actor) {
-	if (CurrentAction != ActionDefault) return;
+	if (CurrentAction != EAction::Default) return;
 
 	//FCollisionQueryParams CollisionQueryParams;
 	//GetWorld()->DebugDrawTraceTag = "Debug";
@@ -143,7 +143,7 @@ void ADefaultCharacter::Hold(AActor* Actor) {
 	}
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "hold!");
-	CurrentAction = ActionHolding;
+	CurrentAction = EAction::Holding;
 	HeldActor = Actor;
 
 	HeldActor->OnActorHit.AddDynamic(this, &ADefaultCharacter::HeldActorHit); // bind actor hit delegate
@@ -153,7 +153,7 @@ void ADefaultCharacter::EndHold() {
 	if (!HeldActor) { return; }
 	HeldActor->OnActorHit.RemoveAll(this); // unbind actor hit delegate
 	HeldActor = nullptr;
-	CurrentAction = ActionDefault;
+	CurrentAction = EAction::Default;
 }
 
 void ADefaultCharacter::Throw() {
@@ -225,12 +225,12 @@ void ADefaultCharacter::InputJump() {
 
 void ADefaultCharacter::InputInteract() {
 	switch (CurrentAction) {
-	case ActionDefault: {
+	case EAction::Default: {
 		if (InteractTraceHitComponent) {
 			InteractTraceHitComponent->Interact(this);
 		}
 	} break;
-	case ActionHolding: {
+	case EAction::Holding: {
 		EndHold();
 	} break;
 	}
@@ -238,7 +238,7 @@ void ADefaultCharacter::InputInteract() {
 
 void ADefaultCharacter::InputAltInteract() {
 	switch (CurrentAction) {
-	case ActionHolding: {
+	case EAction::Holding: {
 		Throw();
 	} break;
 	}
