@@ -5,7 +5,6 @@
 #pragma once
 
 #include <algorithm>
-
 #include "CoreMinimal.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -58,6 +57,10 @@ public:
 	// Sets default values for this character's properties
 	ADefaultCharacter();
 
+private:
+	// NOah stuff
+	float lastDodgeTime;
+	// 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UCameraComponent* Camera;
@@ -73,6 +76,9 @@ protected:
 	float HoldMaxPitch = 70;
 	float HoldMinPitch = -45;
 	float HoldLastHit = -999;
+
+
+	
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -120,4 +126,7 @@ public:
 	virtual void InputJump();
 	virtual void InputInteract();
 	virtual void InputAltInteract();
+	
+	// Noah stuff
+	virtual void Dodge();
 };
