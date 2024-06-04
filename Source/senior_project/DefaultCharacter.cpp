@@ -4,7 +4,6 @@
 // Elise Maino 2024
 
 #include "DefaultCharacter.h"
-
 // Sets default values
 ADefaultCharacter::ADefaultCharacter()
 {
@@ -24,6 +23,8 @@ ADefaultCharacter::ADefaultCharacter()
 	//FTransform CameraTransform;
 	Camera->SetRelativeTransform(CAMERA_TRANSFORM, false);
 	Camera->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+
+	lastDodgeTime = -5.f;
 }
 
 // Called when the game starts or when spawned
@@ -190,7 +191,50 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	InputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Jump);
 	InputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputInteract);
 	InputComponent->BindAction("AltInteract", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputAltInteract);
+
+	InputComponent->BindAction("Dodge", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Dodge);
+
+	
 }
+//  Noahs addition just in case it sucks we can delete it
+void ADefaultCharacter::Dodge() {
+    float CooldownTime = 2.f;
+    float TimeSinceLastDodge = GetWorld()->GetTimeSeconds() - lastDodgeTime;
+
+    if (TimeSinceLastDodge < CooldownTime) {
+        if (GEngine) {
+            float RemainingTime = CooldownTime - TimeSinceLastDodge;
+            FString Message = FString::Printf(TEXT("Dodge is on cooldown! Wait for %.1f more seconds."), RemainingTime);
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Message);
+        }
+        return;
+    }
+
+	lastDodgeTime = GetWorld()->GetTimeSeconds();
+    float DashDistance = 250.f;
+    float DashSpeed = 1000.f;
+
+    FVector DashDir = GetActorForwardVector();
+
+    FVector TargetLocation = GetActorLocation() + DashDir * DashDistance;
+
+    // Perform a trace to check for obstacles
+    FHitResult HitResult;
+    FCollisionQueryParams QueryParams;
+    QueryParams.AddIgnoredActor(this);
+
+    if (GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), TargetLocation, ECC_Visibility, QueryParams)) {
+        // There is an obstacle, so adjust the target location to stop at the obstacle
+        TargetLocation = HitResult.Location;
+    }
+
+    FVector Velocity = (TargetLocation - GetActorLocation()).GetSafeNormal() * DashSpeed;
+    GetCharacterMovement()->AddInputVector(Velocity);
+    SetActorLocation(TargetLocation);
+}
+
+
+// 
 
 void ADefaultCharacter::InputMovementX(float Value) {
 	FRotator Rot = Controller->GetControlRotation();
@@ -243,3 +287,5 @@ void ADefaultCharacter::InputAltInteract() {
 	} break;
 	}
 }
+
+
