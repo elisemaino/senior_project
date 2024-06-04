@@ -70,6 +70,7 @@ protected:
 	float HoldOffset = 75; // offset added to bounding sphere radius when determining distance of held object from player
 	float HoldVelocityScale = 25;
 	float HoldMaxVelocity = 1000; // maximum velocity of a held object. also the throw velocity
+	float UpgradedHoldMaxVelocity = 2000;
 	float HoldMaxPitch = 70;
 	float HoldMinPitch = -45;
 	float HoldLastHit = -999;

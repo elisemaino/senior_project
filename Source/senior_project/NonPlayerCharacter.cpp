@@ -10,7 +10,6 @@ ANonPlayerCharacter::ANonPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Interaction = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
-	Interaction->Hint = FText::FromString("Test"); // debug
 }
 
 // Called when the game starts or when spawned
@@ -18,7 +17,7 @@ void ANonPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Interaction->OnInteract.AddDynamic(this, &ANonPlayerCharacter::Speak);
+	//Interaction->OnInteract.AddDynamic(this, &ANonPlayerCharacter::Speak);
 }
 
 // Called every frame

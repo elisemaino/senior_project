@@ -163,7 +163,7 @@ void ADefaultCharacter::Throw() {
 	FRotator Rot = Controller->GetControlRotation();
 	Rot.Pitch = FMath::Clamp(Rot.Pitch, HoldMinPitch, HoldMaxPitch);
 	const FVector Dir = FRotationMatrix(Rot).GetScaledAxis(EAxis::X);
-	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Dir * HoldMaxVelocity);
+	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Dir * (Items.Contains(EItem::ThrowUpgrade) ? UpgradedHoldMaxVelocity : HoldMaxVelocity));
 	EndHold();
 }
 
