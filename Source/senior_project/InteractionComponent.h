@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Character.h"
-
 #include "InteractionComponent.generated.h"
 
 //UENUM(BlueprintType)
