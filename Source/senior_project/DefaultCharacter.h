@@ -45,7 +45,7 @@
 UENUM(BlueprintType)
 enum class EAction : uint8 {
 	Default,
-	Holding
+	Holding,
 };
 
 UCLASS(Blueprintable, BlueprintType)
