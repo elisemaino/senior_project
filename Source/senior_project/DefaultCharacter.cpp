@@ -12,6 +12,8 @@ ADefaultCharacter::ADefaultCharacter()
 
 	//CurrentAction = EAction::Default;
 
+	//Items = new TArray<EItem>;
+
 	UCharacterMovementComponent* Movement = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	//Movement->Mass = MOVEMENT_MASS;
 	Movement->AirControl = MOVEMENT_AIR_CONTROL;
@@ -31,6 +33,9 @@ ADefaultCharacter::ADefaultCharacter()
 void ADefaultCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	DialogueWidget = CreateWidget<UDialogueWidget>(GetWorld(), UDialogueWidget::StaticClass());
+	DialogueWidget->AddToViewport();
 }
 
 // Called every frame
@@ -158,7 +163,7 @@ void ADefaultCharacter::EndHold() {
 }
 
 void ADefaultCharacter::Throw() {
-	if (!HeldActor) { return; }
+	if (!HeldActor) return;
 	AStaticMeshActor* MeshActor = Cast<AStaticMeshActor>(HeldActor);
 	if (!MeshActor) return;
 	FRotator Rot = Controller->GetControlRotation();
@@ -191,15 +196,12 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	InputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Jump);
 	InputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputInteract);
 	InputComponent->BindAction("AltInteract", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputAltInteract);
-
-	InputComponent->BindAction("Dodge", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Dodge);
-
-	
+	InputComponent->BindAction("Dodge", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Dodge);	
 }
-//  Noahs addition just in case it sucks we can delete it
+//  Noahs addition just in case it sucks we can delete it (its cool though!!)
 void ADefaultCharacter::Dodge() {
     float CooldownTime = 2.f;
-    float TimeSinceLastDodge = GetWorld()->GetTimeSeconds() - lastDodgeTime;
+    float TimeSinceLastDodge = GetWorld()->GetTimeSeconds() - lastDodgeTime; // try GetGameTimeSinceCreation();?
 
     if (TimeSinceLastDodge < CooldownTime) {
         if (GEngine) {
@@ -210,7 +212,7 @@ void ADefaultCharacter::Dodge() {
         return;
     }
 
-	lastDodgeTime = GetWorld()->GetTimeSeconds();
+	lastDodgeTime = GetWorld()->GetTimeSeconds(); // try GetGameTimeSinceCreation();?
     float DashDistance = 250.f;
     float DashSpeed = 1000.f;
 

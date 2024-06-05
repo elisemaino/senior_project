@@ -10,6 +10,8 @@ ANonPlayerCharacter::ANonPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Interaction = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
+
+	//Dialogue = TSharedPtr<TArray<FText>>(new TArray<FText>());
 }
 
 // Called when the game starts or when spawned
@@ -17,7 +19,7 @@ void ANonPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//Interaction->OnInteract.AddDynamic(this, &ANonPlayerCharacter::Speak);
+	Interaction->OnInteract.AddDynamic(this, &ANonPlayerCharacter::Speak);
 }
 
 // Called every frame
@@ -43,18 +45,14 @@ void ANonPlayerCharacter::UpdateDialogue() {
 //}
 
 void ANonPlayerCharacter::Speak(ACharacter* Character) {
-	GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "hi");
 	ADefaultCharacter* NewTargetCharacter = Cast<ADefaultCharacter>(Character);
-	if (NewTargetCharacter) {
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, "yippee");
-		TargetCharacter = NewTargetCharacter;
-	}
-	//Speak();
+	if (!NewTargetCharacter) return;
+	TargetCharacter = NewTargetCharacter;
 	UpdateDialogue();
-	if (Dialogue.Num() > 0) {
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, Dialogue[DialogueIndex].ToString());
-	}
-	DialogueIndex = (DialogueIndex + 1) % Dialogue.Num();
+	if (Dialogue.Num() <= 0) return;
+	NewTargetCharacter->DialogueWidget->AddDialogue(&Dialogue, DialoguePriority);
 
-	this->Destroy();
+		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, Dialogue[DialogueIndex].ToString());
+	//Speak();
+	//DialogueIndex = (DialogueIndex + 1) % Dialogue.Num();
 }

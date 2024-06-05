@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FText> Dialogue;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int DialoguePriority = 0;
+
 	// which dialogue will be displayed next.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int DialogueIndex;
@@ -41,13 +44,16 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
+	UFUNCTION()
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// updates dialogue, based on TargetCharacter properties. override this wherever necessary
+	UFUNCTION()
 	virtual void UpdateDialogue();
 
 	// display the next dialogue
 	//virtual void Speak();
 	// bound to the InteractionComponent's Interact event. updates TargetCharacter.
+	UFUNCTION(BlueprintCallable)
 	void Speak(ACharacter* Character);
 };

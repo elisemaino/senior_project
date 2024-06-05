@@ -22,6 +22,7 @@
 
 #include "InteractionComponent.h"
 #include "InventoryItem.h"
+#include "DialogueWidget.h"
 
 #include "DefaultCharacter.generated.h"
 
@@ -56,6 +57,7 @@ class SENIOR_PROJECT_API ADefaultCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ADefaultCharacter();
+
 
 private:
 	// NOah stuff
@@ -96,6 +98,9 @@ public:
 
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	TArray<EItem> Items;
+
+	UPROPERTY(Blueprintable, BlueprintReadOnly)
+	UDialogueWidget* DialogueWidget;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
