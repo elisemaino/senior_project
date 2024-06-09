@@ -26,6 +26,8 @@ ADefaultCharacter::ADefaultCharacter()
 	Camera->SetRelativeTransform(CAMERA_TRANSFORM, false);
 	Camera->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 
+	DialogueController = CreateDefaultSubobject<UDialogueControllerComponent>(TEXT("DialogueController"));
+
 	lastDodgeTime = -5.f;
 }
 
@@ -34,8 +36,23 @@ void ADefaultCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DialogueWidget = CreateWidget<UDialogueWidget>(GetWorld(), UDialogueWidget::StaticClass());
-	DialogueWidget->AddToViewport();
+	//DialogueWidget = CreateWidget<UDialogueWidget>(GetWorld(), UDialogueWidget::StaticClass());
+	//DialogueWidget->AddToViewport();
+
+	FDialogueRecord DialogueRecord;
+	DialogueController->ParseTagRecord("TestTag0", DialogueRecord);
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
+	while (DialogueRecord.NextKey > 0) {
+		DialogueController->ParseNextRecord(DialogueRecord);
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
+	}
+
+	DialogueController->ParseTagRecord("TestTag1", DialogueRecord);
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
+	while (DialogueRecord.NextKey > 0) {
+		DialogueController->ParseNextRecord(DialogueRecord);
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
+	}
 }
 
 // Called every frame

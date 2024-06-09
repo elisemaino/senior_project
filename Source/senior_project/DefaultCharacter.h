@@ -23,6 +23,7 @@
 #include "InteractionComponent.h"
 #include "InventoryItem.h"
 #include "DialogueWidget.h"
+#include "DialogueControllerComponent.h"
 
 #include "DefaultCharacter.generated.h"
 
@@ -66,6 +67,9 @@ private:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	class UCameraComponent* Camera;
+
+	UPROPERTY(BlueprintReadOnly)
+	class UDialogueControllerComponent* DialogueController;
 
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	class UInteractionComponent* InteractTraceHitComponent; // updated every frame. nullptr if no component was found.
