@@ -38,21 +38,6 @@ void ADefaultCharacter::BeginPlay()
 
 	//DialogueWidget = CreateWidget<UDialogueWidget>(GetWorld(), UDialogueWidget::StaticClass());
 	//DialogueWidget->AddToViewport();
-
-	FDialogueRecord DialogueRecord;
-	DialogueController->ParseTagRecord("TestTag0", DialogueRecord);
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
-	while (DialogueRecord.NextKey > 0) {
-		DialogueController->ParseNextRecord(DialogueRecord);
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
-	}
-
-	DialogueController->ParseTagRecord("TestTag1", DialogueRecord);
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
-	while (DialogueRecord.NextKey > 0) {
-		DialogueController->ParseNextRecord(DialogueRecord);
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("%s: %s (%d %ld)"), *DialogueRecord.Speaker, *DialogueRecord.Text, DialogueRecord.Priority, DialogueRecord.NextKey));
-	}
 }
 
 // Called every frame
@@ -217,6 +202,8 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 //  Noahs addition just in case it sucks we can delete it (its cool though!!)
 void ADefaultCharacter::Dodge() {
+	if (!Items.Contains(EItem::DodgeUpgrade)) return;
+
     float CooldownTime = 2.f;
     float TimeSinceLastDodge = GetWorld()->GetTimeSeconds() - lastDodgeTime; // try GetGameTimeSinceCreation();?
 

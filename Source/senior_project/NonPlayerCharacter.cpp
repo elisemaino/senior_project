@@ -19,6 +19,7 @@ void ANonPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	Interaction->Hint = Hint;
 	Interaction->OnInteract.AddDynamic(this, &ANonPlayerCharacter::Speak);
 }
 
@@ -44,13 +45,26 @@ void ANonPlayerCharacter::UpdateDialogue() {
 	
 //}
 
+void ANonPlayerCharacter::FaceTargetCharacter() {
+	FVector dest = TargetCharacter->GetActorLocation();
+	FVector pos = GetActorLocation();
+	FVector dir = dest - pos;
+	dir.Z = 0;
+	FRotator rot = dir.Rotation();
+	SetActorRotation(rot);
+}
+
 void ANonPlayerCharacter::Speak(ACharacter* Character) {
 	ADefaultCharacter* NewTargetCharacter = Cast<ADefaultCharacter>(Character);
 	if (!NewTargetCharacter) return;
 	TargetCharacter = NewTargetCharacter;
+	TargetCharacter->DialogueController->NewDialogue(DialogueTag);
+	FaceTargetCharacter();
+	/*
 	UpdateDialogue();
 	if (Dialogue.Num() <= 0) return;
 	NewTargetCharacter->DialogueWidget->AddDialogue(&Dialogue, DialoguePriority);
+	*/
 
 		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, Dialogue[DialogueIndex].ToString());
 	//Speak();

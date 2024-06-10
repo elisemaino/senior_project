@@ -18,12 +18,15 @@
 USTRUCT(Blueprintable, BlueprintType)
 struct FDialogueRecord {
 	GENERATED_BODY()
-
 	//int64 Key; // position of start of line
 	//FString Tag = ""; // meta-name of the record for conversation starting points
+	UPROPERTY(BlueprintReadOnly)
 	FString Speaker = "";
+	UPROPERTY(BlueprintReadOnly)
 	FString Text = "";
+	UPROPERTY(BlueprintReadOnly)
 	int Priority = 0;
+	UPROPERTY(BlueprintReadOnly)
 	int64 NextKey = -1;
 };
 
@@ -43,21 +46,28 @@ private:
 public:	
 
 	UPROPERTY(Blueprintable, BlueprintReadWrite)
-	FString DIALOGUE_FILEPATH = "dialogue.csv";
+	FString DIALOGUE_FILEPATH = "dialogue/dialogue.csv";
 
 	TMap<FString, int64> TagKeyMap; // initialized by ParseKeys. maps tags to start of line
+
+	// Sets default values for this component's properties
+	UDialogueControllerComponent();
 
 	UFUNCTION(BlueprintCallable)
 	void ParseKeys();
 
 	UFUNCTION(BlueprintCallable)
-	bool ParseTagRecord(FString Tag, FDialogueRecord& DialogueRecord); // position of start of line
+	bool ParseTagRecord(FString Tag, UPARAM(ref) FDialogueRecord& DialogueRecord); // position of start of line
 
 	UFUNCTION(BlueprintCallable)
-	bool ParseNextRecord(FDialogueRecord& DialogueRecord);
+	bool ParseNextRecord(UPARAM(ref) FDialogueRecord& DialogueRecord);
 
-	// Sets default values for this component's properties
-	UDialogueControllerComponent();
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNewDialogue, FString, Tag);
+	UPROPERTY(BlueprintAssignable, Category = "Event")
+	FNewDialogue OnNewDialogue;
+
+	UFUNCTION(BlueprintCallable)
+	void NewDialogue(FString Tag);
 
 protected:
 	// Called when the game starts

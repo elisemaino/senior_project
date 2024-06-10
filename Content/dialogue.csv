@@ -1,6 +1,0 @@
-Tag,Speaker,Text,Priority,Next
-TestTag0,TestSpeaker,TestText0,0,
-,TestSpeaker,TestText1,0,
-,TestSpeaker,TestText2,0,End
-TestTag1,TestSpeaker,TestText3,0,
-,TestSpeaker,TestText4,0,TestTag0

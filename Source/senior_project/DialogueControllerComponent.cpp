@@ -14,6 +14,7 @@ FString UDialogueControllerComponent::ParseField() {
 			switch (c) {
 			case '"':
 				quote = !quote;
+				break;
 			case '\n':
 				end = true;
 				break;
@@ -35,7 +36,10 @@ FString UDialogueControllerComponent::ParseField() {
 }
 
 bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& DialogueRecord) {
-	if (Key < 0) return false;
+	if (Key < 0) {
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("key < 0")));
+		return false;
+	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Key: %ld"), Key));
 	Stream.clear();
 	Stream.seekg(Key, Stream.beg);
@@ -67,8 +71,18 @@ bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& Dialo
 	return true;
 }
 
+// Sets default values for this component's properties
+UDialogueControllerComponent::UDialogueControllerComponent()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = true;
+
+	// ...
+}
+
 void UDialogueControllerComponent::ParseKeys() {
-	Stream.open(*(FPaths::ProjectContentDir() + DIALOGUE_FILEPATH));
+	Stream.open(TCHAR_TO_ANSI(*(FPaths::ProjectContentDir() + DIALOGUE_FILEPATH))); // cast to char* is important for HTML5 build
 	if (!Stream.is_open()) {
 		UE_LOG(LogTemp, Error, TEXT("Could not parse %s: std::ifstream error 0x%04x"), *DIALOGUE_FILEPATH, Stream.rdstate());
 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("Could not parse %s: std::ifstream error 0x%04x"), Stream.rdstate()));
@@ -105,20 +119,16 @@ bool UDialogueControllerComponent::ParseTagRecord(FString Tag, FDialogueRecord& 
 }
 
 bool UDialogueControllerComponent::ParseNextRecord(FDialogueRecord& DialogueRecord) {
-	if (!Stream.is_open()) return false;
+	if (!Stream.is_open()) {
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("not open")));
+		return false;
+	}
 	return ParseRecord(DialogueRecord.NextKey, DialogueRecord);
 }
 
-// Sets default values for this component's properties
-UDialogueControllerComponent::UDialogueControllerComponent()
-{
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+void UDialogueControllerComponent::NewDialogue(FString Tag) {
+	OnNewDialogue.Broadcast(Tag);
 }
-
 
 // Called when the game starts
 void UDialogueControllerComponent::BeginPlay()

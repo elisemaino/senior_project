@@ -31,14 +31,10 @@ public:
 	class UInteractionComponent* Interaction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FText> Dialogue;
+	FText Hint = FText::FromString("");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int DialoguePriority = 0;
-
-	// which dialogue will be displayed next.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int DialogueIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Dialogue")
+	FString DialogueTag = "";
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -50,6 +46,9 @@ public:
 	// updates dialogue, based on TargetCharacter properties. override this wherever necessary
 	UFUNCTION()
 	virtual void UpdateDialogue();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void FaceTargetCharacter();
 
 	// display the next dialogue
 	//virtual void Speak();

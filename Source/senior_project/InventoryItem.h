@@ -9,6 +9,7 @@
 UENUM(BlueprintType)
 enum class EItem : uint8 {
 	ThrowUpgrade = 0,
+	DodgeUpgrade,
 	Key0 = 100
 };
 
