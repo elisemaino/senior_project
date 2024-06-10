@@ -1,4 +1,4 @@
 Tag,Speaker,Text,Priority,Next
 TestTag0,Carefree Security Guard,Are you sure you are supposed to be here?,0,
-,Carefree Security Guard,"Oh well, just do not cause any trouble.",0,End
-TestTag1,Clumsy Security Guard,"Oh no, where did I leave my ID card?",0,End
+,Carefree Security Guard,"Oh well, just do not cause any trouble.",0,null
+TestTag1,Clumsy Security Guard,"Oh no, where did I leave my ID card?",0,null
