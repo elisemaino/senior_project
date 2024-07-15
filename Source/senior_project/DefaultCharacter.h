@@ -29,9 +29,9 @@
 
 // default movement values
 #define MOVEMENT_MASS 1000
-#define MOVEMENT_AIR_CONTROL 0.55
+#define MOVEMENT_AIR_CONTROL 0.1
 #define MOVEMENT_MAX_ACCELERATION 3300
-#define MOVEMENT_BRAKING_DECELERATION_FALLING 1500
+#define MOVEMENT_BRAKING_DECELERATION_FALLING 800
 
 // min and max pitch of the camera
 #define CAMERA_PITCH_MAX 89.0
@@ -48,6 +48,7 @@ UENUM(BlueprintType)
 enum class EAction : uint8 {
 	Default,
 	Holding,
+	Frozen,
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -81,6 +82,8 @@ protected:
 	float HoldMinPitch = -45;
 	float HoldLastHit = -999;
 
+	float FreezeRotationSpeed = 5;
+
 
 	
 
@@ -106,12 +109,17 @@ public:
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	UDialogueWidget* DialogueWidget;
 
+	UPROPERTY(Blueprintable, BlueprintReadWrite)
+	FRotator FreezeRotation;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void TickDefault(float DeltaTime);
 
 	virtual void TickHolding(float DeltaTime);
+
+	virtual void TickFrozen(float DeltaTime);
 
 	// Hold an actor
 	UFUNCTION(BlueprintCallable)
@@ -125,6 +133,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Throw();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Freeze();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Unfreeze();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

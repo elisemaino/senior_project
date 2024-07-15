@@ -56,6 +56,9 @@ void ADefaultCharacter::Tick(float DeltaTime)
 	case EAction::Holding: {
 		TickHolding(DeltaTime);
 	} break;
+	case EAction::Frozen: {
+		TickFrozen(DeltaTime);
+	}
 	default: {
 		TickDefault(DeltaTime);
 	} break;
@@ -127,6 +130,14 @@ void ADefaultCharacter::TickHolding(float DeltaTime) {
 	//MeshActor->GetStaticMeshComponent()->AddImpulse(Dir * HoldMaxVelocity);
 }
 
+void ADefaultCharacter::TickFrozen(float DeltaTime) {
+	FRotator Rot = Controller->GetControlRotation();
+	FRotator Dir = FreezeRotation - Rot;
+	if (Dir.IsNearlyZero(0.01)) return;
+	Rot += Dir.GetNormalized() * FreezeRotationSpeed * DeltaTime;
+	Controller->SetControlRotation(Rot);
+}
+
 void ADefaultCharacter::Hold(AActor* Actor) {
 	if (CurrentAction != EAction::Default) return;
 
@@ -173,6 +184,16 @@ void ADefaultCharacter::Throw() {
 	const FVector Dir = FRotationMatrix(Rot).GetScaledAxis(EAxis::X);
 	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Dir * (Items.Contains(EItem::ThrowUpgrade) ? UpgradedHoldMaxVelocity : HoldMaxVelocity));
 	EndHold();
+}
+
+
+void ADefaultCharacter::Freeze() {
+	EndHold();
+	CurrentAction = EAction::Frozen;
+}
+
+void ADefaultCharacter::Unfreeze() {
+	CurrentAction = EAction::Default;
 }
 
 
@@ -243,6 +264,7 @@ void ADefaultCharacter::Dodge() {
 // 
 
 void ADefaultCharacter::InputMovementX(float Value) {
+	if (CurrentAction == EAction::Frozen) return;
 	FRotator Rot = Controller->GetControlRotation();
 	Rot.Pitch = 0.0;
 	const FVector Dir = FRotationMatrix(Rot).GetScaledAxis(EAxis::X);
@@ -250,6 +272,7 @@ void ADefaultCharacter::InputMovementX(float Value) {
 }
 
 void ADefaultCharacter::InputMovementY(float Value) {
+	if (CurrentAction == EAction::Frozen) return;
 	FRotator Rot = Controller->GetControlRotation();
 	Rot.Pitch = 0.0;
 	const FVector Dir = FRotationMatrix(Rot).GetScaledAxis(EAxis::Y);
@@ -257,12 +280,14 @@ void ADefaultCharacter::InputMovementY(float Value) {
 }
 
 void ADefaultCharacter::InputCameraX(float Value) {
+	if (CurrentAction == EAction::Frozen) return;
 	FRotator Rot = Controller->GetControlRotation();
 	Rot += FRotator(0, Value, 0);
 	Controller->SetControlRotation(Rot);
 }
 
 void ADefaultCharacter::InputCameraY(float Value) {
+	if (CurrentAction == EAction::Frozen) return;
 	FRotator Rot = Controller->GetControlRotation();
 	//Rot += FRotator(Value, 0, 0);
 	Rot += FRotator(Rot.Pitch + Value > CAMERA_PITCH_MAX || Rot.Pitch + Value < CAMERA_PITCH_MIN ? 0 : Value, 0, 0);
