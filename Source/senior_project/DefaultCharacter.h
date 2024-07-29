@@ -74,7 +74,7 @@ protected:
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	class UInteractionComponent* InteractTraceHitComponent; // updated every frame. nullptr if no component was found.
 
-	bool CrouchToggle = false;
+	bool CrouchToggle = true;
 	
 	float InteractMaxDistance = 300; // maximum distance which a character can interact with an object
 	float HoldMaxDistance = 275; // maximum distance from an object before forcibly letting go of it

@@ -31,11 +31,12 @@ FString UDialogueControllerComponent::ParseField() {
 			break;
 		}
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "out: " + out);
 
 	return out;
 }
 
-bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& DialogueRecord) {
+bool UDialogueControllerComponent::ParseRecord(int32 Key, FDialogueRecord& DialogueRecord) {
 	if (Key < 0) {
 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("key < 0")));
 		return false;
@@ -58,7 +59,7 @@ bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& Dialo
 	DialogueRecord.Priority = FCString::Atoi(*ParseField());
 
 	FString Next = ParseField();
-	if (Next == "") {
+	if (Next == "" || Next == " " || Next == "-") {
 		DialogueRecord.NextKey = Stream.tellg();
 	} else if (Next.ToLower() == "null") {
 		DialogueRecord.NextKey = -1;
@@ -90,7 +91,7 @@ void UDialogueControllerComponent::ParseKeys() {
 	}
 	char c;
 	FString Tag = ""; // tag at beginning of line
-	int64 Key = 0; // start of current record
+	int32 Key = 0; // start of current record
 	int iterations = 0; // debug
 	while (Stream.get(c) && iterations < MAX_LOOP_ITERATIONS) { // debug
 		if (c == ',') {

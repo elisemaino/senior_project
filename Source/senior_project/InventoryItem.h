@@ -12,6 +12,7 @@ enum class EItem : uint8 {
 	DodgeUpgrade = 1,
 	CarryUpgrade = 2,
 	KeyGate = 100,
-	KeyElevator = 101
+	KeyElevator = 101,
+	CreditChip = 200,
 };
 
