@@ -1,5 +1,14 @@
 Tag,Speaker,Text,Priority,Next
-TestTag0,Carefree Security Guard,Are you sure you are supposed to be here?,0,
+TestTag0,Carefree Security Guard,Are you sure you are supposed to be here?,0,-
 ,Carefree Security Guard,"Oh well, just do not cause any trouble.",0,null
 TestTag1,Clumsy Security Guard,"Oh no, where did I leave my ID card?",0,null
-Caught0,Guard,"Hey, you can't be in here!",0,null
+CarryUpgrade,Carry Upgrade Acquired,You can now carry heavy objects.,0,null
+DodgeUpgrade,Dash Upgrade Acquired,Press F to quickly dash forward. Works in mid-air.,0,null
+ThrowUpgrade,Throw Upgrade Acquired,Thrown objects are twice as fast.,0,null
+Caught0,Security Guard,"Hey, you can't be in here!",0,null
+Overworld0,Carefree Night Owl,This floor has been under construction for ages.,0,-
+,Carefree Night Owl,A lot of random stuff gets left in there by the workers.,0,-
+,Carefree Night Owl,And some of the scaffolding seems totally useless...,0,-
+,Carefree Night Owl,Oh well! What do I know?,0,null
+Overworld1,Wary Observer,That warehouse with the automatic gate weirds me out.,0,-
+,Wary Observer,Nothing good comes from warehouses.,0,null

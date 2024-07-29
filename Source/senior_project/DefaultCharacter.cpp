@@ -19,6 +19,8 @@ ADefaultCharacter::ADefaultCharacter()
 	Movement->AirControl = MOVEMENT_AIR_CONTROL;
 	Movement->MaxAcceleration = MOVEMENT_MAX_ACCELERATION;
 	Movement->BrakingDecelerationFalling = MOVEMENT_BRAKING_DECELERATION_FALLING;
+	Movement->CrouchedHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * MOVEMENT_CROUCH_HEIGHT_SCALE;
+	Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	//FAttachmentTransformRules CameraAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -47,6 +49,7 @@ void ADefaultCharacter::Tick(float DeltaTime)
 	
 	// camera
 	Camera->SetWorldRotation(GetControlRotation(), false);
+	Camera->SetRelativeLocation(FVector(0, 0, GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()), false);
 
 	// interact
 	InteractTraceHitComponent = nullptr; 
@@ -127,7 +130,7 @@ void ADefaultCharacter::TickHolding(float DeltaTime) {
 	}*/
 
 	MeshActor->GetStaticMeshComponent()->SetPhysicsLinearVelocity(Vel);
-	//MeshActor->GetStaticMeshComponent()->AddImpulse(Dir * HoldMaxVelocity);
+	//MeshActor->GetStaticMeshComponent()->AddImpulse(Vel);
 }
 
 void ADefaultCharacter::TickFrozen(float DeltaTime) {
@@ -162,9 +165,10 @@ void ADefaultCharacter::Hold(AActor* Actor) {
 	}
 
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "hold!");
+	AStaticMeshActor* MeshActor = Cast<AStaticMeshActor>(Actor);
+	if (!MeshActor) return;
 	CurrentAction = EAction::Holding;
 	HeldActor = Actor;
-
 	HeldActor->OnActorHit.AddDynamic(this, &ADefaultCharacter::HeldActorHit); // bind actor hit delegate
 }
 
@@ -216,10 +220,12 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	InputComponent->BindAxis("MovementY", this, &ADefaultCharacter::InputMovementY);
 	InputComponent->BindAxis("CameraX", this, &ADefaultCharacter::InputCameraX);
 	InputComponent->BindAxis("CameraY", this, &ADefaultCharacter::InputCameraY);
-	InputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Jump);
+	InputComponent->BindAction("Jump", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputJump);
+	InputComponent->BindAction("Crouch", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputCrouchPress);
+	InputComponent->BindAction("Crouch", EInputEvent::IE_Released, this, &ADefaultCharacter::InputCrouchRelease);
 	InputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputInteract);
 	InputComponent->BindAction("AltInteract", EInputEvent::IE_Pressed, this, &ADefaultCharacter::InputAltInteract);
-	InputComponent->BindAction("Dodge", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Dodge);	
+	InputComponent->BindAction("Dodge", EInputEvent::IE_Pressed, this, &ADefaultCharacter::Dodge);
 }
 //  Noahs addition just in case it sucks we can delete it (its cool though!!)
 void ADefaultCharacter::Dodge() {
@@ -296,6 +302,28 @@ void ADefaultCharacter::InputCameraY(float Value) {
 
 void ADefaultCharacter::InputJump() {
 	Jump();
+}
+
+void ADefaultCharacter::InputCrouchPress() {
+	if (CrouchToggle) {
+		if (GetCharacterMovement()->IsCrouching()) {
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "uncrouch?!");
+			UnCrouch();
+		} else {
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "crouch?!");
+			Crouch();
+		}
+	} else {
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "crouch?!");
+		Crouch();
+	}
+}
+
+void ADefaultCharacter::InputCrouchRelease() {
+	if (!CrouchToggle) {
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "uncrouch?!");
+		UnCrouch();
+	}
 }
 
 void ADefaultCharacter::InputInteract() {

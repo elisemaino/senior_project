@@ -19,6 +19,7 @@
 #include "Math/UnrealMathUtility.h"
 #include "Camera/CameraComponent.h"
 #include "CollisionShape.h"
+#include "AI/Navigation/NavigationTypes.h"
 
 #include "InteractionComponent.h"
 #include "InventoryItem.h"
@@ -32,6 +33,7 @@
 #define MOVEMENT_AIR_CONTROL 0.1
 #define MOVEMENT_MAX_ACCELERATION 3300
 #define MOVEMENT_BRAKING_DECELERATION_FALLING 800
+#define MOVEMENT_CROUCH_HEIGHT_SCALE 0.75
 
 // min and max pitch of the camera
 #define CAMERA_PITCH_MAX 89.0
@@ -72,6 +74,8 @@ protected:
 	UPROPERTY(Blueprintable, BlueprintReadOnly)
 	class UInteractionComponent* InteractTraceHitComponent; // updated every frame. nullptr if no component was found.
 
+	bool CrouchToggle = true;
+	
 	float InteractMaxDistance = 300; // maximum distance which a character can interact with an object
 	float HoldMaxDistance = 275; // maximum distance from an object before forcibly letting go of it
 	float HoldOffset = 75; // offset added to bounding sphere radius when determining distance of held object from player
@@ -148,6 +152,8 @@ public:
 	virtual void InputCameraX(float Value);
 	virtual void InputCameraY(float Value);
 	virtual void InputJump();
+	virtual void InputCrouchPress();
+	virtual void InputCrouchRelease();
 	virtual void InputInteract();
 	virtual void InputAltInteract();
 	
