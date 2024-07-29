@@ -59,7 +59,7 @@ bool UDialogueControllerComponent::ParseRecord(int32 Key, FDialogueRecord& Dialo
 	DialogueRecord.Priority = FCString::Atoi(*ParseField());
 
 	FString Next = ParseField();
-	if (Next == "" || Next == " " || Next == "-") {
+	if (Next.Equals("", ESearchCase::IgnoreCase) || Next.Equals(" ", ESearchCase::IgnoreCase) || Next.Equals("-", ESearchCase::IgnoreCase)) {
 		DialogueRecord.NextKey = Stream.tellg();
 	} else if (Next.ToLower() == "null") {
 		DialogueRecord.NextKey = -1;
