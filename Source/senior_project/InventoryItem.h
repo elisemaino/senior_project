@@ -16,8 +16,9 @@ enum class EItem : uint8 {
 	CarryUpgrade = 2,
 	KeyGarageGate = 100,
 	KeyElevator = 101,
-	KeyRoofGate = 100,
+	KeyRoofGate = 102,
 	CreditChip = 200,
+	None = 255
 };
 
 /* UEnum can be glitchy but this isn't worth refactoring at this point.
