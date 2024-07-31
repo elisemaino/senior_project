@@ -38,9 +38,11 @@
 // min and max pitch of the camera
 #define CAMERA_PITCH_MAX 89.0
 #define CAMERA_PITCH_MIN -89.0
+#define CAMERA_CROUCH_SPEED 150.0
 
 // initial transform of camera
-#define CAMERA_TRANSFORM FTransform(FVector(0, 0, 88))
+#define CAMERA_HEIGHT 76.0
+#define CAMERA_TRANSFORM FTransform(FVector(0, 0, CAMERA_HEIGHT))
 
 // params for when a held object "sticks" to a surface (to avoid weird physics glitches)
 #define HOLD_STICK_TIME 0.05
@@ -51,6 +53,7 @@ enum class EAction : uint8 {
 	Default,
 	Holding,
 	Frozen,
+	Dash,
 };
 
 UCLASS(Blueprintable, BlueprintType)

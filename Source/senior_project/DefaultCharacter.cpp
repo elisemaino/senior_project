@@ -50,7 +50,18 @@ void ADefaultCharacter::Tick(float DeltaTime)
 	
 	// camera
 	Camera->SetWorldRotation(GetControlRotation(), false);
-	Camera->SetRelativeLocation(FVector(0, 0, GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight()), false);
+	float z;
+	if (!GetCharacterMovement()->IsFalling()) {
+		z = CAMERA_CROUCH_SPEED * DeltaTime * (GetCharacterMovement()->IsCrouching() ? -1 : 1);
+		if (GetCharacterMovement()->IsCrouching()) {
+			z = std::min(std::max((double)Camera->RelativeLocation.Z + z, CAMERA_HEIGHT * MOVEMENT_CROUCH_HEIGHT_SCALE), CAMERA_HEIGHT * (2 - MOVEMENT_CROUCH_HEIGHT_SCALE));
+		} else {
+			z = std::min(std::max((double)Camera->RelativeLocation.Z + z, CAMERA_HEIGHT * MOVEMENT_CROUCH_HEIGHT_SCALE * MOVEMENT_CROUCH_HEIGHT_SCALE), CAMERA_HEIGHT);
+		}
+	} else {
+		z = CAMERA_HEIGHT;
+	}
+	Camera->SetRelativeLocation(FVector(0, 0, z), false);
 
 	// interact
 	InteractTraceHitComponent = nullptr; 
@@ -254,6 +265,7 @@ void ADefaultCharacter::Dodge() {
 
     // Perform a trace to check for obstacles
     FHitResult HitResult;
+	/*
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(this);
 
@@ -261,10 +273,11 @@ void ADefaultCharacter::Dodge() {
         // There is an obstacle, so adjust the target location to stop at the obstacle
         TargetLocation = HitResult.Location;
     }
+	*/
 
     FVector Velocity = (TargetLocation - GetActorLocation()).GetSafeNormal() * DashSpeed;
-    GetCharacterMovement()->AddInputVector(Velocity);
-    SetActorLocation(TargetLocation);
+    //GetCharacterMovement()->AddInputVector(Velocity);
+    bool Hit = SetActorLocation(TargetLocation, true, &HitResult);
 }
 
 
@@ -308,22 +321,22 @@ void ADefaultCharacter::InputJump() {
 void ADefaultCharacter::InputCrouchPress() {
 	if (CrouchToggle) {
 		if (GetCharacterMovement()->IsCrouching()) {
-			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "uncrouch?!");
 			UnCrouch();
+			Camera->SetRelativeLocation(FVector(0, 0, CAMERA_HEIGHT * MOVEMENT_CROUCH_HEIGHT_SCALE * MOVEMENT_CROUCH_HEIGHT_SCALE));
 		} else {
-			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "crouch?!");
 			Crouch();
+			Camera->SetRelativeLocation(FVector(0, 0, CAMERA_HEIGHT * (2 - MOVEMENT_CROUCH_HEIGHT_SCALE)));
 		}
 	} else {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "crouch?!");
 		Crouch();
+		Camera->SetRelativeLocation(FVector(0, 0, CAMERA_HEIGHT * (2 - MOVEMENT_CROUCH_HEIGHT_SCALE)));
 	}
 }
 
 void ADefaultCharacter::InputCrouchRelease() {
 	if (!CrouchToggle) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, "uncrouch?!");
 		UnCrouch();
+		Camera->SetRelativeLocation(FVector(0, 0, CAMERA_HEIGHT * MOVEMENT_CROUCH_HEIGHT_SCALE * MOVEMENT_CROUCH_HEIGHT_SCALE));
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "DialogueControllerComponent.generated.h"
 
 #define MAX_LOOP_ITERATIONS 100000
+#define PARSE_BUFFER_SIZE 1024
 
 USTRUCT(Blueprintable, BlueprintType)
 struct FDialogueRecord {
@@ -38,7 +39,7 @@ class SENIOR_PROJECT_API UDialogueControllerComponent : public UActorComponent
 private:
 	std::ifstream Stream;
 
-	FString ParseField();
+	int ParseField(char* buffer, int buffer_size);
 
 	UFUNCTION()
 	bool ParseRecord(int64 Key, FDialogueRecord& DialogueRecord);

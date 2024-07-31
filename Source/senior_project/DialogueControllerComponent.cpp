@@ -3,13 +3,15 @@
 
 #include "DialogueControllerComponent.h"
 
-FString UDialogueControllerComponent::ParseField() {
-	FString out = "";
-	
+int UDialogueControllerComponent::ParseField(char* buffer, int buffer_size) {
+	//FString out = "";
+	memset(buffer, 0, sizeof(char) * buffer_size);
+
+	int i = 0;
 	char c;
 	bool end = false;
 	bool quote = false;
-	while (!end) {
+	while (!end && i < buffer_size - 1) {
 		if (Stream.get(c)) {
 			switch (c) {
 			case '"':
@@ -25,15 +27,15 @@ FString UDialogueControllerComponent::ParseField() {
 				}
 				// fallthrough
 			default:
-				out.AppendChar(c);
+				buffer[i] = c;
+				i++;
 			}
 		} else {
 			break;
 		}
 	}
-	// GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "out: " + out);
 
-	return out;
+	return i;
 }
 
 bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& DialogueRecord) {
@@ -47,27 +49,35 @@ bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& Dialo
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("tellg: %d"), (int)Stream.tellg()));
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("0x%04x"), Stream.rdstate()));
 
-	char buffer[1024];
-	memset(buffer, 0, sizeof(buffer));
+	char buffer[PARSE_BUFFER_SIZE];
 
 	// ignore tag
 	Stream.ignore(std::numeric_limits<std::streamsize>::max(), ',');
 	
 	// order is extremely important
-	DialogueRecord.Speaker = ParseField();
-	DialogueRecord.Text = ParseField();
-	DialogueRecord.Priority = FCString::Atoi(*ParseField());
+	ParseField(buffer, PARSE_BUFFER_SIZE);
+	DialogueRecord.Speaker = FString(buffer);
+	ParseField(buffer, PARSE_BUFFER_SIZE);
+	DialogueRecord.Text = FString(buffer);
+	ParseField(buffer, PARSE_BUFFER_SIZE);
+	DialogueRecord.Priority = atoi(buffer);
 
-	FString Next = ParseField();
-	if (Next.Equals("", ESearchCase::IgnoreCase) || Next.Equals(" ", ESearchCase::IgnoreCase) || Next.Equals("-", ESearchCase::IgnoreCase)) {
-		DialogueRecord.NextKey = Stream.tellg();
-	} else if (Next.ToLower() == "null") {
-		DialogueRecord.NextKey = -1;
+	ParseField(buffer, PARSE_BUFFER_SIZE);
+	const FString Next = FString(buffer);
+	int64 NextKey;
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "next: " + Next);
+	if (buffer[0] == 0 || buffer[0] == '-') { // fstring len() and comparisons dont work here in HTML5 builds for some reason. using char* is the workaround
+		NextKey = Stream.tellg();
+	} else if (buffer[0] == 'n' && buffer[1] == 'u' && buffer[2] == 'l' && buffer[3] == 'l') {
+		NextKey = -1;
 	} else if (TagKeyMap.Contains(Next)) {
-		DialogueRecord.NextKey = TagKeyMap[Next];
+		NextKey = TagKeyMap[Next];
 	} else {
-		DialogueRecord.NextKey = -1;
+		NextKey = -2;
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("next v: %d"), NextKey));
+	DialogueRecord.NextKey = NextKey;
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("next: %d"), DialogueRecord.NextKey));
 
 	return true;
 }
