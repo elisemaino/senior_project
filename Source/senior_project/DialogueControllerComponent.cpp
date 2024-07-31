@@ -31,14 +31,14 @@ FString UDialogueControllerComponent::ParseField() {
 			break;
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "out: " + out);
+	// GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "out: " + out);
 
 	return out;
 }
 
 bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& DialogueRecord) {
 	if (Key < 0) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("key < 0")));
+		// GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("key < 0")));
 		return false;
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Green, FString::Printf(TEXT("Key: %ld"), Key));

@@ -14,6 +14,7 @@ enum class EItem : uint8 {
 	ThrowUpgrade = 0,
 	DodgeUpgrade = 1,
 	CarryUpgrade = 2,
+	IdentityUpgrade = 3,
 	KeyGarageGate = 100,
 	KeyElevator = 101,
 	KeyRoofGate = 102,

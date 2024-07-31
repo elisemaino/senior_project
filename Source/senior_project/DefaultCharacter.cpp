@@ -21,6 +21,7 @@ ADefaultCharacter::ADefaultCharacter()
 	Movement->BrakingDecelerationFalling = MOVEMENT_BRAKING_DECELERATION_FALLING;
 	Movement->CrouchedHalfHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight() * MOVEMENT_CROUCH_HEIGHT_SCALE;
 	Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
+	Movement->bCanWalkOffLedgesWhenCrouching = true;
 
 	//FAttachmentTransformRules CameraAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));

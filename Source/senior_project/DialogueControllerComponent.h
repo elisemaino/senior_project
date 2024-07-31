@@ -25,7 +25,7 @@ struct FDialogueRecord {
 	UPROPERTY(BlueprintReadOnly)
 	FString Text = "";
 	UPROPERTY(BlueprintReadOnly)
-	int Priority = 0;
+	int Priority = -1;
 	UPROPERTY(BlueprintReadOnly)
 	int64 NextKey = -1;
 };
