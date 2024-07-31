@@ -18,7 +18,7 @@
 USTRUCT(Blueprintable, BlueprintType)
 struct FDialogueRecord {
 	GENERATED_BODY()
-	//int32 Key; // position of start of line
+	//int64 Key; // position of start of line
 	//FString Tag = ""; // meta-name of the record for conversation starting points
 	UPROPERTY(BlueprintReadOnly)
 	FString Speaker = "";
@@ -27,7 +27,7 @@ struct FDialogueRecord {
 	UPROPERTY(BlueprintReadOnly)
 	int Priority = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 NextKey = -1;
+	int64 NextKey = -1;
 };
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -41,14 +41,14 @@ private:
 	FString ParseField();
 
 	UFUNCTION()
-	bool ParseRecord(int32 Key, FDialogueRecord& DialogueRecord);
+	bool ParseRecord(int64 Key, FDialogueRecord& DialogueRecord);
 
 public:	
 
 	UPROPERTY(Blueprintable, BlueprintReadWrite)
 	FString DIALOGUE_FILEPATH = "dialogue/dialogue.csv";
 
-	TMap<FString, int32> TagKeyMap; // initialized by ParseKeys. maps tags to start of line
+	TMap<FString, int64> TagKeyMap; // initialized by ParseKeys. maps tags to start of line
 
 	// Sets default values for this component's properties
 	UDialogueControllerComponent();

@@ -36,7 +36,7 @@ FString UDialogueControllerComponent::ParseField() {
 	return out;
 }
 
-bool UDialogueControllerComponent::ParseRecord(int32 Key, FDialogueRecord& DialogueRecord) {
+bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& DialogueRecord) {
 	if (Key < 0) {
 		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, FString::Printf(TEXT("key < 0")));
 		return false;
@@ -91,7 +91,7 @@ void UDialogueControllerComponent::ParseKeys() {
 	}
 	char c;
 	FString Tag = ""; // tag at beginning of line
-	int32 Key = 0; // start of current record
+	int64 Key = 0; // start of current record
 	int iterations = 0; // debug
 	while (Stream.get(c) && iterations < MAX_LOOP_ITERATIONS) { // debug
 		if (c == ',') {
