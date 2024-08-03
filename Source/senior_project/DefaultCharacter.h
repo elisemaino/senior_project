@@ -91,7 +91,11 @@ protected:
 
 	float FreezeRotationSpeed = 5;
 
-
+	FVector DashVector = FVector();
+	float DashSpeed = 1800;
+	float DashDuration = 0.17;
+	float DashStartTime = -10;
+	float DashCooldown = 1;
 	
 
 	// Called when the game starts or when spawned
@@ -127,6 +131,8 @@ public:
 	virtual void TickHolding(float DeltaTime);
 
 	virtual void TickFrozen(float DeltaTime);
+
+	virtual void TickDash(float DeltaTime);
 
 	// Hold an actor
 	UFUNCTION(BlueprintCallable)

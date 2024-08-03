@@ -46,5 +46,11 @@ EndAllItems,,The android descended to the building's exit.,3,-
 ,,bring them back here again.,3,-
 ,,But were they even the same person anymore?,3,-
 ,,"After all, no part of their body was the same.",3,ThankYou
-ThankYou,,Thank you for playing!,3,-
+ThankYou,, ,3,-
+,,Thank you for playing!,3,-
+,,Made by Elise Maino and Noah Buteau.,3,-
+,,Made by Elise Maino and Noah Buteau.,3,-
 ,,Made by Elise Maino and Noah Buteau.,3,null
+GameStart,,(I can't do this anymore.),0,-
+,,(I need to escape this place.),0,-
+,,(I'm afraid.),0,null

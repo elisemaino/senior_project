@@ -73,7 +73,10 @@ void ADefaultCharacter::Tick(float DeltaTime)
 	} break;
 	case EAction::Frozen: {
 		TickFrozen(DeltaTime);
-	}
+	} break;
+	case EAction::Dash: {
+		TickDash(DeltaTime);
+	} break;
 	default: {
 		TickDefault(DeltaTime);
 	} break;
@@ -151,6 +154,17 @@ void ADefaultCharacter::TickFrozen(float DeltaTime) {
 	if (Dir.IsNearlyZero(0.01)) return;
 	Rot += Dir.GetNormalized() * FreezeRotationSpeed * DeltaTime;
 	Controller->SetControlRotation(Rot);
+}
+
+void ADefaultCharacter::TickDash(float DeltaTime) {
+	if (GetGameTimeSinceCreation() - DashStartTime > DashDuration) {
+		CurrentAction = EAction::Default;
+		return;
+	}
+
+	FHitResult HitResult;
+	FVector v = DashVector * DashSpeed * DeltaTime;
+	bool Hit = SetActorLocation(GetActorLocation() + v, true, &HitResult);
 }
 
 void ADefaultCharacter::Hold(AActor* Actor) {
@@ -242,42 +256,11 @@ void ADefaultCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 //  Noahs addition just in case it sucks we can delete it (its cool though!!)
 void ADefaultCharacter::Dodge() {
 	if (!Items.Contains(EItem::DodgeUpgrade)) return;
+	if (GetGameTimeSinceCreation() - DashStartTime <= DashCooldown) return;
 
-    float CooldownTime = 2.f;
-    float TimeSinceLastDodge = GetWorld()->GetTimeSeconds() - lastDodgeTime; // try GetGameTimeSinceCreation();?
-
-    if (TimeSinceLastDodge < CooldownTime) {
-        if (GEngine) {
-            float RemainingTime = CooldownTime - TimeSinceLastDodge;
-            FString Message = FString::Printf(TEXT("Dodge is on cooldown! Wait for %.1f more seconds."), RemainingTime);
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, Message);
-        }
-        return;
-    }
-
-	lastDodgeTime = GetWorld()->GetTimeSeconds(); // try GetGameTimeSinceCreation();?
-    float DashDistance = 250.f;
-    float DashSpeed = 1000.f;
-
-    FVector DashDir = GetActorForwardVector();
-
-    FVector TargetLocation = GetActorLocation() + DashDir * DashDistance;
-
-    // Perform a trace to check for obstacles
-    FHitResult HitResult;
-	/*
-    FCollisionQueryParams QueryParams;
-    QueryParams.AddIgnoredActor(this);
-
-    if (GetWorld()->LineTraceSingleByChannel(HitResult, GetActorLocation(), TargetLocation, ECC_Visibility, QueryParams)) {
-        // There is an obstacle, so adjust the target location to stop at the obstacle
-        TargetLocation = HitResult.Location;
-    }
-	*/
-
-    FVector Velocity = (TargetLocation - GetActorLocation()).GetSafeNormal() * DashSpeed;
-    //GetCharacterMovement()->AddInputVector(Velocity);
-    bool Hit = SetActorLocation(TargetLocation, true, &HitResult);
+	DashStartTime = GetGameTimeSinceCreation();
+	DashVector = GetActorForwardVector();
+	CurrentAction = EAction::Dash;
 }
 
 
