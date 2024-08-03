@@ -1,5 +1,5 @@
 Tag,Speaker,Text,Priority,Next
-TestTag0,Carefree Security Guard,Are you sure you are supposed to be here?,0,
+TestTag0,Carefree Security Guard,Are you sure you are supposed to be here?,0,-
 ,Carefree Security Guard,"Oh well, just do not cause any trouble.",0,null
 TestTag1,Clumsy Security Guard,"Oh no, where did I leave my ID card?",0,null
 CarryUpgrade,Carry Upgrade Acquired,You can now carry heavy objects.,2,null
@@ -9,20 +9,20 @@ IdentityUpgrade,Identity Replaced,You now look just like a human.,2,null
 Caught0,Security Guard,"Hey, you can't be in here!",0,null
 ElevatorNoKey,,"It's locked, and you don't have the keycard.",1,null
 ElevatorUnlocked,,You unlocked the door with the keycard.,1,null
-Overworld0,Carefree Night Owl,This floor has been under construction for ages.,0,
-,Carefree Night Owl,A lot of random stuff gets left in there by the workers.,0,
-,Carefree Night Owl,And some of the scaffolding seems totally useless...,0,
+Overworld0,Carefree Night Owl,This floor has been under construction for ages.,0,-
+,Carefree Night Owl,A lot of random stuff gets left in there by the workers.,0,-
+,Carefree Night Owl,And some of the scaffolding seems totally useless...,0,-
 ,Carefree Night Owl,Oh well! What do I know?,0,null
-Overworld1,Wary Observer,A lot of the people who live here own androids.,0,
-,Wary Observer,"They're allowed to walk freely within this building,",0,
-,Wary Observer,since security will apprehend them if they try to leave.,0,
-,Wary Observer,"But that probably wouldn't even happen, ",0,
-,Wary Observer,since androids can't disobey their programming.,0,
+Overworld1,Wary Observer,A lot of the people who live here own androids.,0,-
+,Wary Observer,"They're allowed to walk freely within this building,",0,-
+,Wary Observer,since security will apprehend them if they try to leave.,0,-
+,Wary Observer,"But that probably wouldn't even happen, ",0,-
+,Wary Observer,since androids can't disobey their programming.,0,-
 ,Wary Observer,Do you think they could?,0,null
-HintElevator,Off-duty Construction Worker,The view from the top of this building is beautiful.,0,
+HintElevator,Off-duty Construction Worker,The view from the top of this building is beautiful.,0,-
 ,Off-duty Construction Worker,I wish I hadn't lost my roof access key. . .,0,null
-ShopkeepTalk,Shopkeeper,This android part makes any model look just like a human.,0,
-,Shopkeeper,I'll sell it to you for three credits.,0,
+ShopkeepTalk,Shopkeeper,This android part makes any model look just like a human.,0,-
+,Shopkeeper,I'll sell it to you for three credits.,0,-
 ,Shopkeeper,Did your owner send you here to pick it up?,0,null
 ShopkeepCaught,Shopkeeper,"Hey, you aren't allowed behind the counter!",0,null
 ShopkeepBuy,Shopkeeper,Thank you for your business! Stay safe out there.,0,IdentityUpgrade
@@ -46,5 +46,5 @@ EndAllItems,,The android descended to the building's exit.,3,-
 ,,bring them back here again.,3,-
 ,,But were they even the same person anymore?,3,-
 ,,"After all, no part of their body was the same.",3,ThankYou
-ThankYou,,Thank you for playing!,3,
-,,Made by Elise Maino and Noah Buteau.,3,
+ThankYou,,Thank you for playing!,3,-
+,,Made by Elise Maino and Noah Buteau.,3,null
