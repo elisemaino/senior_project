@@ -28,3 +28,23 @@ ShopkeepCaught,Shopkeeper,"Hey, you aren't allowed behind the counter!",0,null
 ShopkeepBuy,Shopkeeper,Thank you for your business! Stay safe out there.,0,IdentityUpgrade
 ShopkeepNoMoney,Shopkeeper,"Huh? Sorry, you don't have enough credits.",0,null
 ShopkeepSoldOut,Shopkeeper,"Sorry, I'm all sold out.",0,null
+EndNoItems,,The android descended to the building's exit.,3,-
+,,"They were free, as long as they could keep avoiding",3,-
+,,anyone who might bring them back.,3,ThankYou
+EndItemsNoIdentity,,The android descended to the building's exit.,3,-
+,,"They were free, as long as they could keep avoiding",3,-
+,,anyone who might bring them back.,3,-
+,,But were they even the same person anymore?,3,-
+,,"Well, at least part of them remained unchanged.",3,ThankYou
+EndItemsIdentity,,The android descended to the building's exit.,3,-
+,,"Free at last, nobody would be able to",3,-
+,,bring them back here again.,3,-
+,,But were they even the same person anymore?,3,-
+,,"Well, at least part of them remained the same.",3,ThankYou
+EndAllItems,,The android descended to the building's exit.,3,-
+,,"Free at last, nobody would be able to",3,-
+,,bring them back here again.,3,-
+,,But were they even the same person anymore?,3,-
+,,"After all, no part of their body was the same.",3,ThankYou
+ThankYou,,Thank you for playing!,3,
+,,Made by Elise Maino and Noah Buteau.,3,
