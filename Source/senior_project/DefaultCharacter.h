@@ -45,8 +45,8 @@
 #define CAMERA_TRANSFORM FTransform(FVector(0, 0, CAMERA_HEIGHT))
 
 // params for when a held object "sticks" to a surface (to avoid weird physics glitches)
-#define HOLD_STICK_TIME 0.05
-#define HOLD_STICK_FACTOR 0.15
+#define HOLD_STICK_TIME 0.06666
+#define HOLD_STICK_FACTOR 0.22
 
 UENUM(BlueprintType)
 enum class EAction : uint8 {

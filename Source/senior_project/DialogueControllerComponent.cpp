@@ -63,7 +63,7 @@ bool UDialogueControllerComponent::ParseRecord(int64 Key, FDialogueRecord& Dialo
 	DialogueRecord.Priority = atoi(buffer);
 
 	ParseField(buffer, PARSE_BUFFER_SIZE);
-	const FString Next = FString(buffer);
+	const FString Next = FString(&(*buffer)); // so this bug is weird. and this pointer nonsense is the fix. haha
 	int64 NextKey;
 	//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "next: " + Next);
 	if (buffer[0] == 0 || buffer[0] == '-') { // fstring len() and comparisons dont work here in HTML5 builds for some reason. using char* is the workaround

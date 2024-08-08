@@ -180,7 +180,7 @@ void ADefaultCharacter::Hold(AActor* Actor) {
 			AActor* OtherActor = OutOverlaps[i].Actor.Get();
 			if (!OtherActor) { continue; }
 			if (OtherActor == Actor) {
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "initial overlap!");
+				// AddOnScreenDebugMessage(-1, 5, FColor::Red, "initial overlap!");
 				return;
 			}
 		}
