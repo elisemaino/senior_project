@@ -25,27 +25,40 @@ ShopkeepTalk,Shopkeeper,This android part makes any model look just like a human
 ,Shopkeeper,I'll sell it to you for three credits.,0,-
 ,Shopkeeper,Did your owner send you here to pick it up?,0,null
 ShopkeepCaught,Shopkeeper,"Hey, you aren't allowed behind the counter!",0,null
-ShopkeepBuy,Shopkeeper,Thank you for your business! Stay safe out there.,0,IdentityUpgrade
+ShopkeepBuy,Shopkeeper,Thank you for your business! Stay safe out there.,0,-
+,Identity Replaced,You now look just like a human.,2,null
 ShopkeepNoMoney,Shopkeeper,"Huh? Sorry, you don't have enough credits.",0,null
 ShopkeepSoldOut,Shopkeeper,"Sorry, I'm all sold out.",0,null
 EndNoItems,,The android descended to the building's exit.,3,-
 ,,"They were free, as long as they could keep avoiding",3,-
-,,anyone who might bring them back.,3,ThankYou
+,,anyone who might bring them back.,3,-
+,,. . .,3,-
+,,Thank you for playing!,3,-
+,,Made by Elise Maino and Noah Buteau.,3,null
 EndItemsNoIdentity,,The android descended to the building's exit.,3,-
 ,,"They were free, as long as they could keep avoiding",3,-
 ,,anyone who might bring them back.,3,-
 ,,But were they even the same person anymore?,3,-
-,,"Well, at least part of them remained unchanged.",3,ThankYou
+,,"Well, at least part of them remained unchanged.",3,-
+,,. . .,3,-
+,,Thank you for playing!,3,-
+,,Made by Elise Maino and Noah Buteau.,3,null
 EndItemsIdentity,,The android descended to the building's exit.,3,-
 ,,"Free at last, nobody would be able to",3,-
 ,,bring them back here again.,3,-
 ,,But were they even the same person anymore?,3,-
-,,"Well, at least part of them remained the same.",3,ThankYou
+,,"Well, at least part of them remained the same.",3,-
+,,. . .,3,-
+,,Thank you for playing!,3,-
+,,Made by Elise Maino and Noah Buteau.,3,null
 EndAllItems,,The android descended to the building's exit.,3,-
 ,,"Free at last, nobody would be able to",3,-
 ,,bring them back here again.,3,-
 ,,But were they even the same person anymore?,3,-
-,,"After all, no part of their body was the same.",3,ThankYou
+,,"After all, no part of their body was the same.",3,-
+,,. . .,3,-
+,,Thank you for playing!,3,-
+,,Made by Elise Maino and Noah Buteau.,3,null
 ThankYou,,. . .,3,-
 ,,Thank you for playing!,3,-
 ,,Made by Elise Maino and Noah Buteau.,3,-

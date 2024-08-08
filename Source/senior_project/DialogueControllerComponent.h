@@ -39,7 +39,7 @@ class SENIOR_PROJECT_API UDialogueControllerComponent : public UActorComponent
 private:
 	std::ifstream Stream;
 
-	int ParseField(char* buffer, int buffer_size);
+	int ParseField(char* buffer, FString& string, int buffer_size);
 
 	UFUNCTION()
 	bool ParseRecord(int64 Key, FDialogueRecord& DialogueRecord);
